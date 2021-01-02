@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  worker-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: worker
+  template:
+    metadata:
+      labels:
+        component:  worker
+    spec:
+      containers:
+      - name:  worker
+        image:  shazhu/multi-worker
+        env:
+        - name: REDIS_HOST
+          value: redis-cluster-ip-service
+        - name: REDIS_PORT
+          value: "6379"
+
+        # No object within our cluster will make direct requests or connect to worker 
+        # Worker actively access redis and return the result to redis.
+        # Therefore worker does not need to have any port and service assigned to it
+        # We assign port and service only when there are direct requests going into the pod 
